@@ -2,13 +2,14 @@
     "name": "zserio-language-support",
     "displayName": "zserio Language Support",
     "description": "Syntax highlighting for zserio schema language",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "license": "MIT",
     "preview": true,
-    "bugs": "https://https://github.com/4og/zserio-language-support/issues",
+    "publisher": "4og",
+    "bugs": "https://github.com/4og/zserio-language-support/issues",
     "repository": {
         "type": "git",
-        "url": "https://https://github.com/4og/zserio-language-support"
+        "url": "https://github.com/4og/zserio-language-support"
     },
     "engines": {
         "vscode": "^1.50.0"

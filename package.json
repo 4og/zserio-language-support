@@ -1,0 +1,40 @@
+{
+    "name": "zserio-language-support",
+    "displayName": "zserio Language Support",
+    "description": "Syntax highlighting for zserio schema language",
+    "version": "0.1.0",
+    "license": "MIT",
+    "preview": true,
+    "bugs": "https://https://github.com/4og/zserio-language-support/issues",
+    "repository": {
+        "type": "git",
+        "url": "https://https://github.com/4og/zserio-language-support"
+    },
+    "engines": {
+        "vscode": "^1.50.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "zserio",
+            "aliases": [
+                "zserio"
+            ],
+            "extensions": [
+                ".zs",
+                ".ds"
+            ],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "zserio",
+            "scopeName": "source.zs",
+            "path": "./syntaxes/zserio.tmLanguage.json"
+        }]
+    },
+    "devDependencies": {
+        "vsce": "^2.6.3"
+    }
+}

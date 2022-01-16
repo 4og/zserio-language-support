@@ -1,0 +1,143 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "zserio",
+	"patterns": [
+		{
+			"include": "#package"
+		},
+		{
+			"include": "#import"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#storage"
+		},
+		{
+			"include": "#storage_modifiers"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#numeric"
+		},
+		{
+			"comment": "Language constants",
+			"match": "\\b(true|false)\\b",
+			"name": "constant.language.zserio"
+		}
+	],
+	"repository": {
+		"numeric": {
+			"name": "constant.numeric.zserio",
+			"match": "\\b((0(x|X)[0-9a-fA-F]*)|(([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)\\b"
+		},
+		"package": {
+			"match": "\\s*(package)\\s+([\\w.]+)\\s*;",
+			"captures": {
+				"1": {
+					"name": "keyword.other.zserio"
+				},
+				"2": {
+					"name": "string.unquoted.zserio.package"
+				}
+			}
+		},
+		"import": {
+			"match": "\\s*(import)\\s+([\\w.]+)(\\*?)\\s*;",
+			"captures": {
+				"1": {
+					"name": "keyword.other.zserio"
+				},
+				"2": {
+					"name": "string.unquoted.zserio.package"
+				},
+				"3": {
+					"name": "string.other.zserio"
+				}
+			}
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.zserio",
+					"match": "\\b(rule|case|default|publish|subscribe|topic|instantiate|if|return|sql)\\b"
+				}
+			]
+		},
+		"storage": {
+			"patterns": [
+				{
+					"name": "storage.type.zserio",
+					"match": "\\b(const|rule_group|subtype|struct|choice|enum|union|bitmask|service|pubsub|function|string|sql_database|sql_table)\\b"
+				},
+				{
+					"name": "storage.type.boolen.zserio",
+					"match": "\\bbool\\b"
+				},
+				{
+					"name": "storage.type.bit.zserio",
+					"match": "\\b(bit|bitmask)\\b"
+				},
+				{
+					"match": "\\b(float(16|32|64)|(var|varu|u)?int(8|16|32|64)?|varsize)\\b",
+					"name": "storage.type.numeric.zserio"
+				}
+			]
+		},
+		"storage_modifiers": {
+			"patterns": [
+				{
+					"name": "storage.modifier.zserio",
+					"match": "\\b(packed|implicit|optional|align)\\b"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.zserio",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.zserio",
+					"match": "\\\\."
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.block.zserio",
+					"begin": "(\\/\\*)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.comment.zserio"
+						}
+					},
+					"end": "(\\*\\/)",
+					"endCaptures": {
+						"1": {
+							"name": "punctuation.definition.comment.zserio"
+						}
+					}
+				},
+				{
+					"name": "comment.line.double-slash.zserio",
+					"begin": "(\\/\\/)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.definition.comment.zserio"
+						}
+					},
+					"end": "(?:\\n|$)"
+				}
+			]
+		}
+	},
+	"scopeName": "source.zs"
+}

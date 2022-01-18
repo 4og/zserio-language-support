@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "license": "MIT",
     "preview": true,
+    "icon": "images/icon.png",
     "publisher": "4og",
     "bugs": "https://github.com/4og/zserio-language-support/issues",
     "repository": {

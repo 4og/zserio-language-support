@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2022-01-18
+
 - Highlight the type in enum, struct, service, etc.
 - Add operator keywords
 - Add a few missing control keywords

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add goto support for import definitions
+
 ## [0.2.0] - 2022-01-18
 
 - Highlight the type in enum, struct, service, etc.

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-01-21
+
 - Add goto support for import definitions
 
 ## [0.2.0] - 2022-01-18

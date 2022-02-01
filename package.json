@@ -22,26 +22,22 @@
         "onLanguage:zserio"
     ],
     "contributes": {
-        "languages": [
-            {
-                "id": "zserio",
-                "aliases": [
-                    "zserio"
-                ],
-                "extensions": [
-                    ".zs",
-                    ".ds"
-                ],
-                "configuration": "./language-configuration.json"
-            }
-        ],
-        "grammars": [
-            {
-                "language": "zserio",
-                "scopeName": "source.zs",
-                "path": "./syntaxes/zserio.tmLanguage.json"
-            }
-        ]
+        "languages": [{
+            "id": "zserio",
+            "aliases": [
+                "zserio"
+            ],
+            "extensions": [
+                ".zs",
+                ".ds"
+            ],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "zserio",
+            "scopeName": "source.zs",
+            "path": "./syntaxes/zserio.tmLanguage.json"
+        }]
     },
     "main": "./out/extension.js",
     "scripts": {
@@ -56,5 +52,8 @@
         "@types/vscode": "^1.1.37",
         "typescript": "^4.5.5",
         "vsce": "^2.6.3"
+    },
+    "dependencies": {
+        "antlr4": "^4.9.3"
     }
 }

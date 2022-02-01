@@ -2,7 +2,6 @@
 .vscode-test/**
 .gitignore
 .eslintrc.json
-node_modules
 images/*.svg
 src/**
 **/tsconfig.json

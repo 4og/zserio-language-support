@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- Report syntax errors.
+- Support Go To Definition for types.
+- Show zserio package symbols in the outline and breadcrumbs.
+
 ## [0.3.0] - 2022-01-21
 
 - Add goto support for import definitions

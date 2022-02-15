@@ -14,7 +14,7 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
         const parsedDocument = await this.parsedDocumentCollection.getParsedDocument(document);
 
         const packageLocations = await this.locateImportDefinition(parsedDocument, position);
-        if (packageLocations) {
+        if (packageLocations.length > 0) {
             return packageLocations;
         }
 
@@ -24,7 +24,7 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
     private async locateImportDefinition(parsedDocument: ParsedDocument, position: vscode.Position): Promise<vscode.Location[]> {
         const packageReference = parsedDocument.imports.find(ref => ref.range.contains(position));
         if (!packageReference) {
-            return undefined;
+            return [];
         }
         const packageLocations = await this.locateImportByQualifiedName(packageReference.name);
         const emptyRange = new vscode.Range(0, 0, 0, 0);

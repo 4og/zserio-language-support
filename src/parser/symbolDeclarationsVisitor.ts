@@ -19,12 +19,11 @@ export class SymbolDeclarationsVisitor extends ZserioParserVisitor {
 
     override visitPackageNameDefinition(ctx: any) {
         const name = ctx.id().map(i => i.getText()).join(".");
-        console.log(`package ${name}`);
     }
     override visitImportDeclaration(ctx: any) {
-        const name = ctx.id().map(i => i.getText()).join(".");
-        const range = ctx.id().reduce((previousValue, currentValue) =>
-            convertRange(previousValue.start).union(convertRange(currentValue.start)));
+        const ids = ctx.id();
+        const name = ids.map(i => i.getText()).join(".");
+        const range = convertRange(ids[0].start).union(convertRange(ids[ids.length - 1].start));
         this.imports.push(new EntityReference(name, range));
     }
     override visitSubtypeDeclaration(ctx: any) {

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2022-02-15
+
 - Report syntax errors.
 - Support Go To Definition for types.
 - Show zserio package symbols in the outline and breadcrumbs.

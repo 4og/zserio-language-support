@@ -28,7 +28,7 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
         }
         const packageLocations = await this.locateImportByQualifiedName(packageReference.name);
         const emptyRange = new vscode.Range(0, 0, 0, 0);
-        let locations = []
+        const locations = []
         for (const uri of packageLocations.values()) {
             locations.push(new vscode.Location(uri, emptyRange));
         }

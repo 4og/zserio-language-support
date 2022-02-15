@@ -17,9 +17,6 @@ export class SymbolDeclarationsVisitor extends ZserioParserVisitor {
             range, selectionRange)
     }
 
-    override visitPackageNameDefinition(ctx: any) {
-        const name = ctx.id().map(i => i.getText()).join(".");
-    }
     override visitImportDeclaration(ctx: any) {
         const ids = ctx.id();
         const name = ids.map(i => i.getText()).join(".");

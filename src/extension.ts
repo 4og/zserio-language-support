@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import DefinitionProvider from './providers/definitionProvider';
 import DocumentSymbolProvider from './providers/documentSymbolProvider';
+import DocumentSemanticTokensProvider from './providers/documentSemanticTokensProvider';
 
 import { ParsedDocumentCollection } from './parser/parser';
 
@@ -15,6 +16,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     const documentSymbolProvider = vscode.languages.registerDocumentSymbolProvider([languageId], new DocumentSymbolProvider(parsedDocumentCollection));
     context.subscriptions.push(documentSymbolProvider);
+
+    const semanticTokensProvider = vscode.languages.registerDocumentSemanticTokensProvider([languageId], new DocumentSemanticTokensProvider(parsedDocumentCollection),
+        DocumentSemanticTokensProvider.getLegend());
+    context.subscriptions.push(semanticTokensProvider);
 
     if (vscode.window.activeTextEditor) {
         parsedDocumentCollection.parseDocument(vscode.window.activeTextEditor.document);

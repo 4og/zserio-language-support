@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Highlight type declarations and references.
+
 ## [0.4.0] - 2022-02-15
 
 - Report syntax errors.

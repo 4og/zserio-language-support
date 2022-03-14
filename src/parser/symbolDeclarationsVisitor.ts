@@ -23,6 +23,21 @@ class ZserioParserEnumVisitor extends BaseZserioParserVisitor {
     }
 }
 
+class ZserioParserStructVisitor extends BaseZserioParserVisitor {
+    override visitStructureFieldDefinition(ctx: any) {
+        const fieldTypeId = ctx.fieldTypeId();
+        if (fieldTypeId !== null) {
+            this.symbols.push(this.createSymbol(fieldTypeId.id(), ctx, "", vscode.SymbolKind.Field));
+        }
+    }
+    override visitFunctionDefinition(ctx: any) {
+        const functionName = ctx.functionName();
+        if (functionName !== null) {
+            this.symbols.push(this.createSymbol(functionName.id(), ctx, "", vscode.SymbolKind.Function));
+        }
+    }
+}
+
 export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
     imports: EntityReference[] = [];
 
@@ -36,7 +51,11 @@ export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "subtype", vscode.SymbolKind.Constant));
     }
     override visitStructureDeclaration(ctx: any) {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "struct", vscode.SymbolKind.Struct));
+        const structVisitor = new ZserioParserStructVisitor();
+        structVisitor["visitChildren"](ctx);
+        const structSymbol = this.createSymbol(ctx.id(), ctx, "struct", vscode.SymbolKind.Struct);
+        structSymbol.children = structVisitor.symbols;
+        this.symbols.push(structSymbol);
     }
     override visitChoiceDeclaration(ctx: any) {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "choice", vscode.SymbolKind.Struct));
@@ -47,7 +66,7 @@ export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
     override visitEnumDeclaration(ctx: any) {
         const enumVisitor = new ZserioParserEnumVisitor();
         enumVisitor["visitChildren"](ctx);
-        let enumSymbol = this.createSymbol(ctx.id(), ctx, "enum", vscode.SymbolKind.Enum);
+        const enumSymbol = this.createSymbol(ctx.id(), ctx, "enum", vscode.SymbolKind.Enum);
         enumSymbol.children = enumVisitor.symbols;
         this.symbols.push(enumSymbol);
     }

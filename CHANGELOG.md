@@ -2,7 +2,10 @@
 
 ## [Unreleased]
 
-- Highlight type declarations and references.
+## [0.5.0] - 2022-03-14
+
+- Add `zserio_compatibility_version` directive introduced in zserio 2.5.0.
+- Highlight type declarations, references, and enum members.
 
 ## [0.4.0] - 2022-02-15
 

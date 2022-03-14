@@ -3,6 +3,9 @@
     "name": "zserio",
     "scopeName": "source.zs",
     "patterns": [{
+            "include": "#compatibility"
+        },
+        {
             "include": "#package"
         },
         {
@@ -66,6 +69,10 @@
                     "name": "constant.language.zserio"
                 }
             ]
+        },
+        "compatibility": {
+            "match": "\\b(zserio_compatibility_version)\\b",
+            "name": "keyword.other.zserio"
         },
         "package": {
             "match": "\\s*(package)\\s+([\\w.]+)\\s*;",

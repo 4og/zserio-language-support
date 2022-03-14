@@ -11,10 +11,15 @@ tokens { RSHIFT }
 // PACKAGE (main rule)
 
 packageDeclaration
-    :   packageNameDefinition?
+    :   compatibilityVersionDirective?
+        packageNameDefinition?
         importDeclaration*
         languageDirective*
         EOF
+    ;
+
+compatibilityVersionDirective
+    :   COMPAT_VERSION LPAREN STRING_LITERAL RPAREN SEMICOLON
     ;
 
 packageNameDefinition
@@ -48,7 +53,6 @@ symbolDefinition
     :   constDefinition
     |   ruleGroupDefinition
     ;
-
 
 // CONST
 
@@ -118,7 +122,7 @@ fieldArrayRange
     ;
 
 fieldInitializer
-    :   ASSIGN expression
+    :   ASSIGN expression // constant expression
     ;
 
 fieldOptionalClause
@@ -147,7 +151,7 @@ choiceCases
     ;
 
 choiceCase
-    :   CASE expression COLON
+    :   CASE expression COLON // constant expression
     ;
 
 choiceDefault

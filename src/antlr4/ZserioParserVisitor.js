@@ -12,6 +12,12 @@ export default class ZserioParserVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
+	// Visit a parse tree produced by ZserioParser#compatibilityVersionDirective.
+	visitCompatibilityVersionDirective(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 	// Visit a parse tree produced by ZserioParser#packageNameDefinition.
 	visitPackageNameDefinition(ctx) {
 	  return this.visitChildren(ctx);

@@ -14,6 +14,15 @@ export default class ZserioParserListener extends antlr4.tree.ParseTreeListener 
 	}
 
 
+	// Enter a parse tree produced by ZserioParser#compatibilityVersionDirective.
+	enterCompatibilityVersionDirective(ctx) {
+	}
+
+	// Exit a parse tree produced by ZserioParser#compatibilityVersionDirective.
+	exitCompatibilityVersionDirective(ctx) {
+	}
+
+
 	// Enter a parse tree produced by ZserioParser#packageNameDefinition.
 	enterPackageNameDefinition(ctx) {
 	}

@@ -11,9 +11,7 @@ export default class DocumentSemanticTokensProvider implements vscode.DocumentSe
     async provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SemanticTokens> {
         const parsedDocument = await this.parsedDocumentCollection.getParsedDocument(document);
         const builder = new vscode.SemanticTokensBuilder(DocumentSemanticTokensProvider.getLegend());
-        for (const symbol of parsedDocument.symbols) {
-            builder.push(symbol.selectionRange, 'type', ['declaration']);
-        }
+        this.visitSymbols(builder, parsedDocument.symbols);
         for (const reference of parsedDocument.references) {
             builder.push(reference.range, 'type', []);
         }
@@ -21,6 +19,24 @@ export default class DocumentSemanticTokensProvider implements vscode.DocumentSe
     }
 
     static getLegend(): vscode.SemanticTokensLegend {
-        return new vscode.SemanticTokensLegend(['type'], ['declaration']);
+        return new vscode.SemanticTokensLegend(['type', 'enumMember'], ['declaration']);
+    }
+
+    visitSymbols(builder: vscode.SemanticTokensBuilder, symbols: vscode.DocumentSymbol[]) {
+        for (const symbol of symbols) {
+            this.visitSymbol(builder, symbol);
+        }
+    }
+
+    visitSymbol(builder: vscode.SemanticTokensBuilder, symbol: vscode.DocumentSymbol) {
+        switch (symbol.kind) {
+            case vscode.SymbolKind.EnumMember:
+                builder.push(symbol.selectionRange, 'enumMember');
+                break;
+            default:
+                builder.push(symbol.selectionRange, 'type', ['declaration']);
+                break;
+        }
+        this.visitSymbols(builder, symbol.children);
     }
 }

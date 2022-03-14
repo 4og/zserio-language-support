@@ -3,9 +3,8 @@ import ZserioParserVisitor from '../antlr4/ZserioParserVisitor.js';
 import { EntityReference } from './entityReference';
 import { convertRange, convertCompleteRange } from './utils';
 
-export class SymbolDeclarationsVisitor extends ZserioParserVisitor {
+class BaseZserioParserVisitor extends ZserioParserVisitor {
     symbols: vscode.DocumentSymbol[] = [];
-    imports: EntityReference[] = [];
 
     createSymbol(ctxId: any, ctxWhole: any, detail: string, kind: vscode.SymbolKind): vscode.DocumentSymbol {
         const name = ctxId.getText();
@@ -16,6 +15,16 @@ export class SymbolDeclarationsVisitor extends ZserioParserVisitor {
             kind,
             range, selectionRange)
     }
+}
+
+class ZserioParserEnumVisitor extends BaseZserioParserVisitor {
+    override visitEnumItem(ctx: any) {
+        this.symbols.push(this.createSymbol(ctx.id(), ctx, "", vscode.SymbolKind.EnumMember));
+    }
+}
+
+export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
+    imports: EntityReference[] = [];
 
     override visitImportDeclaration(ctx: any) {
         const ids = ctx.id();
@@ -36,7 +45,11 @@ export class SymbolDeclarationsVisitor extends ZserioParserVisitor {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "union", vscode.SymbolKind.Struct));
     }
     override visitEnumDeclaration(ctx: any) {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "enum", vscode.SymbolKind.Enum));
+        const enumVisitor = new ZserioParserEnumVisitor();
+        enumVisitor["visitChildren"](ctx);
+        let enumSymbol = this.createSymbol(ctx.id(), ctx, "enum", vscode.SymbolKind.Enum);
+        enumSymbol.children = enumVisitor.symbols;
+        this.symbols.push(enumSymbol);
     }
     override visitBitmaskDeclaration(ctx: any) {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "bitmask", vscode.SymbolKind.Struct));

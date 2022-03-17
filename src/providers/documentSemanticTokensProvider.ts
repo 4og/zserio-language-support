@@ -19,7 +19,7 @@ export default class DocumentSemanticTokensProvider implements vscode.DocumentSe
     }
 
     static getLegend(): vscode.SemanticTokensLegend {
-        return new vscode.SemanticTokensLegend(['type', 'enumMember'], ['declaration']);
+        return new vscode.SemanticTokensLegend(['type', 'enumMember', 'property', 'method', 'event'], ['declaration']);
     }
 
     visitSymbols(builder: vscode.SemanticTokensBuilder, symbols: vscode.DocumentSymbol[]) {
@@ -32,6 +32,15 @@ export default class DocumentSemanticTokensProvider implements vscode.DocumentSe
         switch (symbol.kind) {
             case vscode.SymbolKind.EnumMember:
                 builder.push(symbol.selectionRange, 'enumMember');
+                break;
+            case vscode.SymbolKind.Field:
+                builder.push(symbol.selectionRange, 'property');
+                break;
+            case vscode.SymbolKind.Method:
+                builder.push(symbol.selectionRange, 'method');
+                break;
+            case vscode.SymbolKind.Event:
+                builder.push(symbol.selectionRange, 'event');
                 break;
             default:
                 builder.push(symbol.selectionRange, 'type', ['declaration']);

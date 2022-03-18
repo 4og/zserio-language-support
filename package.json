@@ -31,6 +31,10 @@
                 "extensions": [
                     ".zs"
                 ],
+                "icon": {
+                    "light": "./images/file-icon-light.png",
+                    "dark": "./images/file-icon-dark.png"
+                },
                 "configuration": "./language-configuration.json"
             },
             {

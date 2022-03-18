@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add icon for zserio files.
+
 ## [0.5.0] - 2022-03-14
 
 - Add `zserio_compatibility_version` directive introduced in zserio 2.5.0.

@@ -36,7 +36,7 @@ export class ParsedDocumentCollection {
         if (parsedDocument && parsedDocument.version == document.version) {
             return parsedDocument;
         }
-        let pd = this.parseZserioDocument(document, this.diagnosticCollection);
+        const pd = this.parseZserioDocument(document, this.diagnosticCollection);
         this.parsedDocuments.set(document.uri.toString(), pd);
         return pd;
     }
@@ -47,7 +47,7 @@ export class ParsedDocumentCollection {
             return parsedDocument;
         }
         const document = vscode.workspace.openTextDocument(uri);
-        let pd = this.parseZserioDocument(await document, this.diagnosticCollection);
+        const pd = this.parseZserioDocument(await document, this.diagnosticCollection);
         this.parsedDocuments.set(uri.toString(), pd);
         return pd;
     }
@@ -73,14 +73,14 @@ export class ParsedDocumentCollection {
         const parser = new ZserioParser(tokens);
         parser["buildParseTrees"] = true;
         parser["removeErrorListeners"]();
-        let diagnostics: vscode.Diagnostic[] = [];
+        const diagnostics: vscode.Diagnostic[] = [];
         parser["addErrorListener"](new SyntaxErrorListener(diagnostics));
         const tree = parser.packageDeclaration();
 
-        let visitor = new SymbolDeclarationsVisitor();
+        const visitor = new SymbolDeclarationsVisitor();
         visitor["visit"](tree);
 
-        let referenceVisitor = new TypeReferenceVisitor();
+        const referenceVisitor = new TypeReferenceVisitor();
         referenceVisitor["visit"](tree);
 
         collection.set(document.uri, diagnostics);

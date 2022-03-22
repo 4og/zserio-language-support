@@ -14,7 +14,7 @@ class BaseZserioParserVisitor extends ZserioParserVisitor {
         const range = convertCompleteRange(ctxWhole.start, ctxWhole.stop);
         const selectionRange = convertRange(ctxId.start);
 
-        let symbol = new vscode.DocumentSymbol(
+        const symbol = new vscode.DocumentSymbol(
             name, detail,
             kind,
             range, selectionRange);

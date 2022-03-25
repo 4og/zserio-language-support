@@ -2,7 +2,10 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2022-03-25
+
 - Add icon for zserio files.
+- Symbol resolution and semantic highlighting of fields of all zserio types.
 
 ## [0.5.0] - 2022-03-14
 

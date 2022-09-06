@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.6.1] - 2022-09-06
+
+- Update dependencies.
+
 ## [0.6.0] - 2022-03-25
 
 - Add icon for zserio files.

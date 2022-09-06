@@ -13,7 +13,7 @@
         "url": "https://github.com/4og/zserio-language-support"
     },
     "engines": {
-        "vscode": "^1.54.0"
+        "vscode": "^1.60.0"
     },
     "categories": [
         "Programming Languages"
@@ -22,7 +22,8 @@
         "onLanguage:zserio"
     ],
     "contributes": {
-        "languages": [{
+        "languages": [
+            {
                 "id": "zserio",
                 "aliases": [
                     "zserio"
@@ -47,7 +48,8 @@
                 "configuration": "./language-configuration.json"
             }
         ],
-        "grammars": [{
+        "grammars": [
+            {
                 "language": "zserio",
                 "scopeName": "source.zs",
                 "path": "./syntaxes/zserio.tmLanguage.json"
@@ -68,15 +70,15 @@
         "lint": "eslint src --ext ts"
     },
     "devDependencies": {
-        "@types/node": "^17.0.22",
-        "@types/vscode": "^1.54.0",
-        "@typescript-eslint/eslint-plugin": "^5.16.0",
-        "@typescript-eslint/parser": "^5.16.0",
-        "eslint": "^8.11.0",
-        "typescript": "^4.6.2",
-        "vsce": "^2.7.0"
+        "@types/node": "^18.7.15",
+        "@types/vscode": "^1.60.0",
+        "@typescript-eslint/eslint-plugin": "^5.36.2",
+        "@typescript-eslint/parser": "^5.36.2",
+        "eslint": "^8.23.0",
+        "typescript": "^4.8.2",
+        "vsce": "^2.11.0"
     },
     "dependencies": {
-        "antlr4": "^4.9.3"
+        "antlr4": "4.9.3"
     }
 }

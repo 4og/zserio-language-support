@@ -590,6 +590,15 @@ export default class ZserioParserListener extends antlr4.tree.ParseTreeListener 
 	}
 
 
+	// Enter a parse tree produced by ZserioParser#isSetExpression.
+	enterIsSetExpression(ctx) {
+	}
+
+	// Exit a parse tree produced by ZserioParser#isSetExpression.
+	exitIsSetExpression(ctx) {
+	}
+
+
 	// Enter a parse tree produced by ZserioParser#bitwiseOrExpression.
 	enterBitwiseOrExpression(ctx) {
 	}

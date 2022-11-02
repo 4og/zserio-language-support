@@ -101,7 +101,7 @@
         },
         "keywords": {
             "patterns": [{
-                    "match": "\\b(rule|case|default|publish|subscribe|topic|instantiate|if|return|sql|numbits|lengthof|valueof|on|using)\\b",
+                    "match": "\\b(rule|case|default|publish|subscribe|topic|instantiate|if|return|sql|numbits|lengthof|valueof|on|using|isset)\\b",
                     "name": "keyword.control.zserio"
                 },
                 {

@@ -2,7 +2,7 @@
     "name": "zserio-language-support",
     "displayName": "zserio Language Support",
     "description": "zserio schema language support",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "license": "MIT",
     "preview": true,
     "icon": "images/icon.png",
@@ -22,8 +22,7 @@
         "onLanguage:zserio"
     ],
     "contributes": {
-        "languages": [
-            {
+        "languages": [{
                 "id": "zserio",
                 "aliases": [
                     "zserio"
@@ -48,8 +47,7 @@
                 "configuration": "./language-configuration.json"
             }
         ],
-        "grammars": [
-            {
+        "grammars": [{
                 "language": "zserio",
                 "scopeName": "source.zs",
                 "path": "./syntaxes/zserio.tmLanguage.json"

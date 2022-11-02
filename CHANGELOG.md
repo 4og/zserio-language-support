@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2022-11-02
+
+- Update grammar to zserio 2.8.0.
+
 ## [0.6.1] - 2022-09-06
 
 - Update dependencies.

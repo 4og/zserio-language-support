@@ -2,7 +2,7 @@
     "name": "zserio-language-support",
     "displayName": "zserio Language Support",
     "description": "zserio schema language support",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "license": "MIT",
     "preview": true,
     "icon": "images/icon.png",
@@ -72,9 +72,9 @@
         "@types/vscode": "^1.60.0",
         "@typescript-eslint/eslint-plugin": "^5.36.2",
         "@typescript-eslint/parser": "^5.36.2",
+        "@vscode/vsce": "^2.16.0",
         "eslint": "^8.23.0",
-        "typescript": "^4.8.2",
-        "vsce": "^2.11.0"
+        "typescript": "^4.8.2"
     },
     "dependencies": {
         "antlr4": "4.9.3"

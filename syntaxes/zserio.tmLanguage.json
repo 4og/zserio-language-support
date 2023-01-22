@@ -152,6 +152,10 @@
                 {
                     "match": "\\bextern\\b",
                     "name": "storage.type.extern.zserio"
+                },
+                {
+                    "match": "\\bbytes\\b",
+                    "name": "storage.type.bytes.zserio"
                 }
             ]
         },

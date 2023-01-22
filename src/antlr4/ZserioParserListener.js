@@ -842,5 +842,14 @@ export default class ZserioParserListener extends antlr4.tree.ParseTreeListener 
 	}
 
 
+	// Enter a parse tree produced by ZserioParser#bytesType.
+	enterBytesType(ctx) {
+	}
+
+	// Exit a parse tree produced by ZserioParser#bytesType.
+	exitBytesType(ctx) {
+	}
+
+
 
 }

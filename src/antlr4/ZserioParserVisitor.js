@@ -564,5 +564,11 @@ export default class ZserioParserVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
+	// Visit a parse tree produced by ZserioParser#bytesType.
+	visitBytesType(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
 
 }

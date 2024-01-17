@@ -1,12 +1,20 @@
 import * as vscode from 'vscode';
-import ZserioParserVisitor from '../antlr4/ZserioParserVisitor.js';
+import ZserioParserVisitor from '../antlr4/ZserioParserVisitor';
+import {
+    BitmaskDeclarationContext, BitmaskValueContext, ChoiceDeclarationContext, ChoiceFieldDefinitionContext, ConstDefinitionContext,
+    EnumDeclarationContext, EnumItemContext, FunctionDefinitionContext, IdContext, ImportDeclarationContext, InstantiateDeclarationContext,
+    PubsubDefinitionContext, PubsubMessageDefinitionContext, RuleGroupDefinitionContext, ServiceDefinitionContext, ServiceMethodDefinitionContext,
+    SqlDatabaseDefinitionContext, SqlDatabaseFieldDefinitionContext, SqlTableDeclarationContext, SqlTableFieldDefinitionContext,
+    StructureDeclarationContext, StructureFieldDefinitionContext, SubtypeDeclarationContext, UnionDeclarationContext
+} from '../antlr4/ZserioParser'
 import { EntityReference } from './entityReference';
 import { convertRange, convertCompleteRange } from './utils';
+import { ParserRuleContext } from 'antlr4';
 
-class BaseZserioParserVisitor extends ZserioParserVisitor {
+class BaseZserioParserVisitor extends ZserioParserVisitor<void> {
     symbols: vscode.DocumentSymbol[] = [];
 
-    createSymbol(ctxId: any, ctxWhole: any, detail: string, kind: vscode.SymbolKind, childrenVisitor?: BaseZserioParserVisitor): vscode.DocumentSymbol {
+    createSymbol(ctxId: IdContext, ctxWhole: ParserRuleContext, detail: string, kind: vscode.SymbolKind, childrenVisitor?: BaseZserioParserVisitor): vscode.DocumentSymbol {
         let name = ctxId.getText();
         if (!name) {
             name = "<invalid>";
@@ -20,7 +28,7 @@ class BaseZserioParserVisitor extends ZserioParserVisitor {
             range, selectionRange);
 
         if (childrenVisitor) {
-            childrenVisitor["visitChildren"](ctxWhole);
+            childrenVisitor.visitChildren(ctxWhole);
             symbol.children = childrenVisitor.symbols;
         }
         return symbol;
@@ -28,40 +36,42 @@ class BaseZserioParserVisitor extends ZserioParserVisitor {
 }
 
 class EnumLikeVisitor extends BaseZserioParserVisitor {
-    override visitEnumItem(ctx: any) {
+
+    override visitEnumItem = (ctx: EnumItemContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "", vscode.SymbolKind.EnumMember));
     }
-    override visitBitmaskValue(ctx: any) {
+    override visitBitmaskValue = (ctx: BitmaskValueContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "", vscode.SymbolKind.EnumMember));
     }
+
 }
 
 class StructLikeVisitor extends BaseZserioParserVisitor {
-    override visitStructureFieldDefinition(ctx: any) {
+    override visitStructureFieldDefinition = (ctx: StructureFieldDefinitionContext) => {
         const fieldTypeId = ctx.fieldTypeId();
         if (fieldTypeId !== null) {
             this.symbols.push(this.createSymbol(fieldTypeId.id(), ctx, "", vscode.SymbolKind.Field));
         }
     }
-    override visitChoiceFieldDefinition(ctx: any) {
+    override visitChoiceFieldDefinition = (ctx: ChoiceFieldDefinitionContext) => {
         const fieldTypeId = ctx.fieldTypeId();
         if (fieldTypeId !== null) {
             this.symbols.push(this.createSymbol(fieldTypeId.id(), ctx, "", vscode.SymbolKind.Field));
         }
     }
-    override visitServiceMethodDefinition(ctx: any) {
+    override visitServiceMethodDefinition = (ctx: ServiceMethodDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "", vscode.SymbolKind.Method));
     }
-    override visitPubsubMessageDefinition(ctx: any) {
+    override visitPubsubMessageDefinition = (ctx: PubsubMessageDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "", vscode.SymbolKind.Event));
     }
-    override visitSqlDatabaseFieldDefinition(ctx: any) {
+    override visitSqlDatabaseFieldDefinition = (ctx: SqlDatabaseFieldDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "", vscode.SymbolKind.Field));
     }
-    override visitSqlTableFieldDefinition(ctx: any) {
+    override visitSqlTableFieldDefinition = (ctx: SqlTableFieldDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "", vscode.SymbolKind.Field));
     }
-    override visitFunctionDefinition(ctx: any) {
+    override visitFunctionDefinition = (ctx: FunctionDefinitionContext) => {
         const functionName = ctx.functionName();
         if (functionName !== null) {
             this.symbols.push(this.createSymbol(functionName.id(), ctx, "", vscode.SymbolKind.Function));
@@ -72,49 +82,49 @@ class StructLikeVisitor extends BaseZserioParserVisitor {
 export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
     imports: EntityReference[] = [];
 
-    override visitImportDeclaration(ctx: any) {
-        const ids = ctx.id();
+    override visitImportDeclaration = (ctx: ImportDeclarationContext) => {
+        const ids = ctx.id_list();
         const name = ids.map(i => i.getText()).join(".");
         const range = convertRange(ids[0].start).union(convertRange(ids[ids.length - 1].start));
         this.imports.push(new EntityReference(name, range));
     }
-    override visitSubtypeDeclaration(ctx: any) {
+    override visitSubtypeDeclaration = (ctx: SubtypeDeclarationContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "subtype", vscode.SymbolKind.Constant));
     }
-    override visitStructureDeclaration(ctx: any) {
+    override visitStructureDeclaration = (ctx: StructureDeclarationContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "struct", vscode.SymbolKind.Struct, new StructLikeVisitor()));
     }
-    override visitChoiceDeclaration(ctx: any) {
+    override visitChoiceDeclaration = (ctx: ChoiceDeclarationContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "choice", vscode.SymbolKind.Struct, new StructLikeVisitor()));
     }
-    override visitUnionDeclaration(ctx: any) {
+    override visitUnionDeclaration = (ctx: UnionDeclarationContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "union", vscode.SymbolKind.Struct, new StructLikeVisitor()));
     }
-    override visitEnumDeclaration(ctx: any) {
+    override visitEnumDeclaration = (ctx: EnumDeclarationContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "enum", vscode.SymbolKind.Enum, new EnumLikeVisitor()));
     }
-    override visitBitmaskDeclaration(ctx: any) {
+    override visitBitmaskDeclaration = (ctx: BitmaskDeclarationContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "bitmask", vscode.SymbolKind.Enum, new EnumLikeVisitor()));
     }
-    override visitSqlTableDeclaration(ctx: any) {
-        this.symbols.push(this.createSymbol(ctx.id()[0], ctx, "sql_table", vscode.SymbolKind.Object, new StructLikeVisitor()));
+    override visitSqlTableDeclaration = (ctx: SqlTableDeclarationContext) => {
+        this.symbols.push(this.createSymbol(ctx.id(0), ctx, "sql_table", vscode.SymbolKind.Object, new StructLikeVisitor()));
     }
-    override visitSqlDatabaseDefinition(ctx: any) {
+    override visitSqlDatabaseDefinition = (ctx: SqlDatabaseDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "sql_database", vscode.SymbolKind.Object, new StructLikeVisitor()));
     }
-    override visitServiceDefinition(ctx: any) {
+    override visitServiceDefinition = (ctx: ServiceDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "service", vscode.SymbolKind.Interface, new StructLikeVisitor()));
     }
-    override visitPubsubDefinition(ctx: any) {
+    override visitPubsubDefinition = (ctx: PubsubDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "pubsub", vscode.SymbolKind.Interface, new StructLikeVisitor()));
     }
-    override visitInstantiateDeclaration(ctx: any) {
+    override visitInstantiateDeclaration = (ctx: InstantiateDeclarationContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "instantiate", vscode.SymbolKind.Object));
     }
-    override visitConstDefinition(ctx: any) {
+    override visitConstDefinition = (ctx: ConstDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "const", vscode.SymbolKind.Constant));
     }
-    override visitRuleGroupDefinition(ctx: any) {
+    override visitRuleGroupDefinition = (ctx: RuleGroupDefinitionContext) => {
         this.symbols.push(this.createSymbol(ctx.id(), ctx, "rule_group", vscode.SymbolKind.Package));
     }
 }

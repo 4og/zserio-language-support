@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import antlr4 from 'antlr4';
-import ZserioLexer from '../antlr4/ZserioLexer.js';
-import ZserioParser from '../antlr4/ZserioParser.js';
+import ZserioLexer from '../antlr4/ZserioLexer';
+import ZserioParser from '../antlr4/ZserioParser';
 import { EntityReference } from './entityReference';
 import { SymbolDeclarationsVisitor } from './symbolDeclarationsVisitor';
 import { TypeReferenceVisitor } from './typeReferenceVisitor';
@@ -66,22 +66,21 @@ export class ParsedDocumentCollection {
 
     parseZserioDocument(document: vscode.TextDocument, collection: vscode.DiagnosticCollection): ParsedDocument {
         collection.delete(document.uri);
-        const chars = new antlr4.InputStream(document.getText());
+        const chars = new antlr4.CharStream(document.getText());
         const lexer = new ZserioLexer(chars);
-        lexer["strictMode"] = false;
         const tokens = new antlr4.CommonTokenStream(lexer);
         const parser = new ZserioParser(tokens);
-        parser["buildParseTrees"] = true;
-        parser["removeErrorListeners"]();
+        parser.buildParseTrees = true;
+        parser.removeErrorListeners();
         const diagnostics: vscode.Diagnostic[] = [];
-        parser["addErrorListener"](new SyntaxErrorListener(diagnostics));
+        parser.addErrorListener(new SyntaxErrorListener(diagnostics));
         const tree = parser.packageDeclaration();
 
         const visitor = new SymbolDeclarationsVisitor();
-        visitor["visit"](tree);
+        visitor.visit(tree);
 
         const referenceVisitor = new TypeReferenceVisitor();
-        referenceVisitor["visit"](tree);
+        referenceVisitor.visit(tree);
 
         collection.set(document.uri, diagnostics);
         console.log(`Parsed ${document.uri} version: ${document.version}`);

@@ -21,6 +21,9 @@
             "include": "#storage_modifiers"
         },
         {
+            "include": "#annotations"
+        },
+        {
             "include": "#strings"
         },
         {
@@ -161,8 +164,14 @@
         },
         "storage_modifiers": {
             "patterns": [{
-                "match": "\\b(packed|implicit|optional|align)\\b",
+                "match": "\\b(packed|implicit|optional|align|extend)\\b",
                 "name": "storage.modifier.zserio"
+            }]
+        },
+        "annotations": {
+            "patterns": [{
+                "match": "(@deprecated|@removed)\\b",
+                "name": "storage.modifier.annotation.zserio"
             }]
         },
         "strings": {

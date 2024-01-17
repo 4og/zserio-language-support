@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2024-01-18
+
+- Update grammar to zserio 2.13.0.
+- Use ANTLR4 Typescript target instead of Javascript.
+
 ## [0.8.0] - 2023-01-22
 
 - Update grammar to zserio 2.9.0.

@@ -7,3 +7,5 @@ src/**
 **/tsconfig.json
 **/*.map
 **/*.ts
+node_modules/antlr4/src/**
+node_modules/antlr4/spec/**

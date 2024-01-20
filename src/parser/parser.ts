@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import antlr4 from 'antlr4';
+import { CharStream, CommonTokenStream, ParserRuleContext } from 'antlr4';
 import ZserioLexer from '../antlr4/ZserioLexer';
 import ZserioParser from '../antlr4/ZserioParser';
 import { EntityReference } from './entityReference';
@@ -8,7 +8,7 @@ import { TypeReferenceVisitor } from './typeReferenceVisitor';
 import { SyntaxErrorListener } from './syntaxErrorListener';
 
 export class ParsedDocument {
-    constructor(version: number, tree: any, symbols: vscode.DocumentSymbol[], references: EntityReference[], imports: EntityReference[]) {
+    constructor(version: number, tree: ParserRuleContext, symbols: vscode.DocumentSymbol[], references: EntityReference[], imports: EntityReference[]) {
         this.version = version;
         this.tree = tree;
         this.symbols = symbols;
@@ -16,7 +16,7 @@ export class ParsedDocument {
         this.imports = imports;
     }
     version: number;
-    tree: any;
+    tree: ParserRuleContext;
     symbols: vscode.DocumentSymbol[];
     references: EntityReference[];
     imports: EntityReference[];
@@ -66,9 +66,9 @@ export class ParsedDocumentCollection {
 
     parseZserioDocument(document: vscode.TextDocument, collection: vscode.DiagnosticCollection): ParsedDocument {
         collection.delete(document.uri);
-        const chars = new antlr4.CharStream(document.getText());
+        const chars = new CharStream(document.getText());
         const lexer = new ZserioLexer(chars);
-        const tokens = new antlr4.CommonTokenStream(lexer);
+        const tokens = new CommonTokenStream(lexer);
         const parser = new ZserioParser(tokens);
         parser.buildParseTrees = true;
         parser.removeErrorListeners();
@@ -86,8 +86,4 @@ export class ParsedDocumentCollection {
         console.log(`Parsed ${document.uri} version: ${document.version}`);
         return new ParsedDocument(document.version, tree, visitor.symbols, referenceVisitor.references, visitor.imports);
     }
-
-
 }
-
-

@@ -7,7 +7,7 @@ export class SyntaxErrorListener extends ErrorListener<Token> {
         this.diagnostics = diagnostics;
     }
     diagnostics: vscode.Diagnostic[];
-    syntaxError(recognizer: Recognizer<Token>, offendingSymbol: Token, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
+    override syntaxError(recognizer: Recognizer<Token>, offendingSymbol: Token, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
         const length = offendingSymbol.stop - offendingSymbol.start + 1;
         this.diagnostics.push({
             code: '',

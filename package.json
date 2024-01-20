@@ -18,9 +18,6 @@
     "categories": [
         "Programming Languages"
     ],
-    "activationEvents": [
-        "onLanguage:zserio"
-    ],
     "contributes": {
         "languages": [
             {

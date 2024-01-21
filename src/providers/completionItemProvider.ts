@@ -13,7 +13,7 @@ export default class CompletionItemProvider implements vscode.CompletionItemProv
 
     async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
         const doc = await this.parsedDocumentCollection.getParsedDocument(document);
-        const currentDocumentSymbols = doc.symbols.map((symbol: vscode.DocumentSymbol): vscode.CompletionItem => { return { label: symbol.name, kind: this.convertSymbolKindToCompletionItemKind(symbol.kind) } });
+        const currentDocumentSymbols = doc.symbols.map((symbol: vscode.DocumentSymbol) => this.createCompletionItem(symbol, doc.docStrings.get(symbol)));
 
         // Search in imports
         const packageFiles = await Promise.all(doc.imports.map(importReference => locateImportByQualifiedName(importReference.name)));
@@ -47,6 +47,10 @@ export default class CompletionItemProvider implements vscode.CompletionItemProv
 
     private async collectSymbols(uri: vscode.Uri): Promise<vscode.CompletionItem[]> {
         const parsedDocument = await this.parsedDocumentCollection.getParsedDocumentByUri(uri);
-        return parsedDocument.symbols.map((symbol: vscode.DocumentSymbol) => { return { label: { label: symbol.name, description: parsedDocument.packageName }, kind: this.convertSymbolKindToCompletionItemKind(symbol.kind) } });
+        return parsedDocument.symbols.map((symbol: vscode.DocumentSymbol) => this.createCompletionItem(symbol, parsedDocument.docStrings.get(symbol), parsedDocument.packageName));
+    }
+
+    private createCompletionItem(symbol: vscode.DocumentSymbol, documentation: vscode.MarkdownString, description?: string): vscode.CompletionItem {
+        return { label: { label: symbol.name, description: description }, kind: this.convertSymbolKindToCompletionItemKind(symbol.kind), detail: symbol.detail, documentation: documentation };
     }
 }

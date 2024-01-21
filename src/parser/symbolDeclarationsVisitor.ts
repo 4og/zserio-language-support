@@ -1,9 +1,8 @@
 import * as vscode from 'vscode';
 import ZserioParserVisitor from '../antlr4/ZserioParserVisitor';
-import {
+import ZserioParser, {
     BitmaskDeclarationContext, BitmaskValueContext, ChoiceDeclarationContext, ChoiceFieldDefinitionContext, ConstDefinitionContext,
     EnumDeclarationContext, EnumItemContext, FunctionDefinitionContext, IdContext, ImportDeclarationContext, InstantiateDeclarationContext,
-    PackageDeclarationContext,
     PackageNameDefinitionContext,
     PubsubDefinitionContext, PubsubMessageDefinitionContext, RuleGroupDefinitionContext, ServiceDefinitionContext, ServiceMethodDefinitionContext,
     SqlDatabaseDefinitionContext, SqlDatabaseFieldDefinitionContext, SqlTableDeclarationContext, SqlTableFieldDefinitionContext,
@@ -15,6 +14,9 @@ import { ParserRuleContext } from 'antlr4';
 
 class BaseZserioParserVisitor extends ZserioParserVisitor<void> {
     symbols: vscode.DocumentSymbol[] = [];
+    docStrings = new Map<vscode.DocumentSymbol, vscode.MarkdownString>;
+    docCommentRegex = /(^\/\*\*|\*\/$|^[^\S\r\n]*\*(\/)?)/gm
+    markdownCommentRegex = /(^\s*\/\*!|!\*\/$)/gm;
 
     createSymbol(ctxId: IdContext, ctxWhole: ParserRuleContext, detail: string, kind: vscode.SymbolKind, childrenVisitor?: BaseZserioParserVisitor): vscode.DocumentSymbol {
         let name = ctxId.getText();
@@ -39,6 +41,27 @@ class BaseZserioParserVisitor extends ZserioParserVisitor<void> {
         }
         return symbol;
     }
+
+    pushDocString(ctx: ParserRuleContext, symbol: vscode.DocumentSymbol) {
+        const idx = ctx.start.tokenIndex;
+        if (idx < 1) {
+            return;
+        }
+        const token = ctx.parser.getTokenStream().get(idx - 1);
+
+        if (token.type == ZserioParser.DOC_COMMENT) {
+            this.docStrings.set(symbol, new vscode.MarkdownString(token.text.replaceAll(this.docCommentRegex, '').trim()));
+        }
+        if (token.type == ZserioParser.MARKDOWN_COMMENT) {
+            this.docStrings.set(symbol, new vscode.MarkdownString(token.text.replaceAll(this.markdownCommentRegex, '').trim()));
+        }
+    }
+
+    pushSymbolWithDocString(ctx: ParserRuleContext, symbol: vscode.DocumentSymbol) {
+        this.pushDocString(ctx, symbol);
+        this.symbols.push(symbol);
+    }
+
 }
 
 class EnumLikeVisitor extends BaseZserioParserVisitor {
@@ -86,8 +109,9 @@ class StructLikeVisitor extends BaseZserioParserVisitor {
 }
 
 export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
-    packageName? : string;
+    packageName?: string;
     imports: EntityReference[] = [];
+
 
     override visitPackageNameDefinition = (ctx: PackageNameDefinitionContext) => {
         const ids = ctx.id_list();
@@ -101,42 +125,42 @@ export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
         this.imports.push(new EntityReference(name, range));
     }
     override visitSubtypeDeclaration = (ctx: SubtypeDeclarationContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "subtype", vscode.SymbolKind.Constant));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "subtype", vscode.SymbolKind.Constant));
     }
     override visitStructureDeclaration = (ctx: StructureDeclarationContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "struct", vscode.SymbolKind.Struct, new StructLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "struct", vscode.SymbolKind.Struct, new StructLikeVisitor()));
     }
     override visitChoiceDeclaration = (ctx: ChoiceDeclarationContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "choice", vscode.SymbolKind.Struct, new StructLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "choice", vscode.SymbolKind.Struct, new StructLikeVisitor()));
     }
     override visitUnionDeclaration = (ctx: UnionDeclarationContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "union", vscode.SymbolKind.Struct, new StructLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "union", vscode.SymbolKind.Struct, new StructLikeVisitor()));
     }
     override visitEnumDeclaration = (ctx: EnumDeclarationContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "enum", vscode.SymbolKind.Enum, new EnumLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "enum", vscode.SymbolKind.Enum, new EnumLikeVisitor()));
     }
     override visitBitmaskDeclaration = (ctx: BitmaskDeclarationContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "bitmask", vscode.SymbolKind.Enum, new EnumLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "bitmask", vscode.SymbolKind.Enum, new EnumLikeVisitor()));
     }
     override visitSqlTableDeclaration = (ctx: SqlTableDeclarationContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(0), ctx, "sql_table", vscode.SymbolKind.Object, new StructLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(0), ctx, "sql_table", vscode.SymbolKind.Object, new StructLikeVisitor()));
     }
     override visitSqlDatabaseDefinition = (ctx: SqlDatabaseDefinitionContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "sql_database", vscode.SymbolKind.Object, new StructLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "sql_database", vscode.SymbolKind.Object, new StructLikeVisitor()));
     }
     override visitServiceDefinition = (ctx: ServiceDefinitionContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "service", vscode.SymbolKind.Interface, new StructLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "service", vscode.SymbolKind.Interface, new StructLikeVisitor()));
     }
     override visitPubsubDefinition = (ctx: PubsubDefinitionContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "pubsub", vscode.SymbolKind.Interface, new StructLikeVisitor()));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "pubsub", vscode.SymbolKind.Interface, new StructLikeVisitor()));
     }
     override visitInstantiateDeclaration = (ctx: InstantiateDeclarationContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "instantiate", vscode.SymbolKind.Object));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "instantiate", vscode.SymbolKind.Object));
     }
     override visitConstDefinition = (ctx: ConstDefinitionContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "const", vscode.SymbolKind.Constant));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "const", vscode.SymbolKind.Constant));
     }
     override visitRuleGroupDefinition = (ctx: RuleGroupDefinitionContext) => {
-        this.symbols.push(this.createSymbol(ctx.id(), ctx, "rule_group", vscode.SymbolKind.Package));
+        this.pushSymbolWithDocString(ctx, this.createSymbol(ctx.id(), ctx, "rule_group", vscode.SymbolKind.Package));
     }
 }

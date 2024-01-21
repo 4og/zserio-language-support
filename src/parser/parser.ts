@@ -8,11 +8,12 @@ import { TypeReferenceVisitor } from './typeReferenceVisitor';
 import { SyntaxErrorListener } from './syntaxErrorListener';
 
 export class ParsedDocument {
-    constructor(version: number, tree: ParserRuleContext, packageName: string | undefined, symbols: vscode.DocumentSymbol[], references: EntityReference[], imports: EntityReference[]) {
+    constructor(version: number, tree: ParserRuleContext, packageName: string | undefined, symbols: vscode.DocumentSymbol[], docStrings: Map<vscode.DocumentSymbol, vscode.MarkdownString>, references: EntityReference[], imports: EntityReference[]) {
         this.version = version;
         this.tree = tree;
         this.packageName = packageName;
         this.symbols = symbols;
+        this.docStrings = docStrings;
         this.references = references;
         this.imports = imports;
     }
@@ -20,6 +21,7 @@ export class ParsedDocument {
     tree: ParserRuleContext;
     packageName?: string;
     symbols: vscode.DocumentSymbol[];
+    docStrings: Map<vscode.DocumentSymbol, vscode.MarkdownString>;
     references: EntityReference[];
     imports: EntityReference[];
 }
@@ -88,6 +90,6 @@ export class ParsedDocumentCollection {
 
         collection.set(document.uri, diagnostics);
         console.log(`Parsed ${document.uri} version: ${document.version}`);
-        return new ParsedDocument(document.version, tree, visitor.packageName, visitor.symbols, referenceVisitor.references, visitor.imports);
+        return new ParsedDocument(document.version, tree, visitor.packageName, visitor.symbols, visitor.docStrings, referenceVisitor.references, visitor.imports);
     }
 }

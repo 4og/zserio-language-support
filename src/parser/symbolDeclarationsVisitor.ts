@@ -3,6 +3,8 @@ import ZserioParserVisitor from '../antlr4/ZserioParserVisitor';
 import {
     BitmaskDeclarationContext, BitmaskValueContext, ChoiceDeclarationContext, ChoiceFieldDefinitionContext, ConstDefinitionContext,
     EnumDeclarationContext, EnumItemContext, FunctionDefinitionContext, IdContext, ImportDeclarationContext, InstantiateDeclarationContext,
+    PackageDeclarationContext,
+    PackageNameDefinitionContext,
     PubsubDefinitionContext, PubsubMessageDefinitionContext, RuleGroupDefinitionContext, ServiceDefinitionContext, ServiceMethodDefinitionContext,
     SqlDatabaseDefinitionContext, SqlDatabaseFieldDefinitionContext, SqlTableDeclarationContext, SqlTableFieldDefinitionContext,
     StructureDeclarationContext, StructureFieldDefinitionContext, SubtypeDeclarationContext, UnionDeclarationContext
@@ -20,7 +22,11 @@ class BaseZserioParserVisitor extends ZserioParserVisitor<void> {
             name = "<invalid>";
         }
         const range = convertCompleteRange(ctxWhole.start, ctxWhole.stop);
-        const selectionRange = convertRange(ctxId.start);
+        let selectionRange = convertRange(ctxId.start);
+
+        if (!range.contains(selectionRange)) {
+            selectionRange = range;
+        }
 
         const symbol = new vscode.DocumentSymbol(
             name, detail,
@@ -80,7 +86,13 @@ class StructLikeVisitor extends BaseZserioParserVisitor {
 }
 
 export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
+    packageName? : string;
     imports: EntityReference[] = [];
+
+    override visitPackageNameDefinition = (ctx: PackageNameDefinitionContext) => {
+        const ids = ctx.id_list();
+        this.packageName = ids.map(i => i.getText()).join(".");
+    }
 
     override visitImportDeclaration = (ctx: ImportDeclarationContext) => {
         const ids = ctx.id_list();

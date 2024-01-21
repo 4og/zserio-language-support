@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ParsedDocumentCollection, ParsedDocument } from '../parser/parser';
+import { locateImportByQualifiedName } from '../parser/utils';
 
 export default class DefinitionProvider implements vscode.DefinitionProvider {
     constructor(parsedDocumentCollection: ParsedDocumentCollection) {
@@ -7,7 +8,6 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
     }
 
     parsedDocumentCollection: ParsedDocumentCollection;
-    readonly maxSearchResults = 10;
 
     async provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Definition> {
 
@@ -26,7 +26,7 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
         if (!packageReference) {
             return [];
         }
-        const packageLocations = await this.locateImportByQualifiedName(packageReference.name);
+        const packageLocations = await locateImportByQualifiedName(packageReference.name);
         const emptyRange = new vscode.Range(0, 0, 0, 0);
         const locations = []
         for (const uri of packageLocations.values()) {
@@ -46,7 +46,7 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
             return [new vscode.Location(uri, symbolLocation.selectionRange)];
         }
         // Search in imports
-        const packageFiles = await Promise.all(parsedDocument.imports.map(importReference => this.locateImportByQualifiedName(importReference.name)));
+        const packageFiles = await Promise.all(parsedDocument.imports.map(importReference => locateImportByQualifiedName(importReference.name)));
         const locations = await Promise.allSettled(packageFiles.flat().map(element => this.findSymbolInDocument(element, reference.name)));
 
         return locations
@@ -67,9 +67,5 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
         }
         return Promise.reject();
     }
-
-    private async locateImportByQualifiedName(name: string): Promise<vscode.Uri[]> {
-        const pathSuffix = name.replace(/\./g, '/') + '.zs';
-        return vscode.workspace.findFiles(`**/${pathSuffix}`, undefined, this.maxSearchResults);
-    }
 }
+

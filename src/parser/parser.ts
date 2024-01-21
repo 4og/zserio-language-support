@@ -8,15 +8,17 @@ import { TypeReferenceVisitor } from './typeReferenceVisitor';
 import { SyntaxErrorListener } from './syntaxErrorListener';
 
 export class ParsedDocument {
-    constructor(version: number, tree: ParserRuleContext, symbols: vscode.DocumentSymbol[], references: EntityReference[], imports: EntityReference[]) {
+    constructor(version: number, tree: ParserRuleContext, packageName: string | undefined, symbols: vscode.DocumentSymbol[], references: EntityReference[], imports: EntityReference[]) {
         this.version = version;
         this.tree = tree;
+        this.packageName = packageName;
         this.symbols = symbols;
         this.references = references;
         this.imports = imports;
     }
     version: number;
     tree: ParserRuleContext;
+    packageName?: string;
     symbols: vscode.DocumentSymbol[];
     references: EntityReference[];
     imports: EntityReference[];
@@ -26,10 +28,12 @@ export class ParsedDocumentCollection {
     constructor(diagnostic_collection: vscode.DiagnosticCollection) {
         this.diagnosticCollection = diagnostic_collection;
         this.parsedDocuments = new Map<string, ParsedDocument>();
+        this.completionKeywords = ZserioLexer.literalNames.filter((name: string | null) => name && name.match(/.*\w.*/) != null).map((name: string) => name.slice(1, -1));
     }
 
     diagnosticCollection: vscode.DiagnosticCollection;
     parsedDocuments: Map<string, ParsedDocument>;
+    completionKeywords: string[];
 
     async getParsedDocument(document: vscode.TextDocument): Promise<ParsedDocument> {
         const parsedDocument = this.parsedDocuments.get(document.uri.toString());
@@ -84,6 +88,6 @@ export class ParsedDocumentCollection {
 
         collection.set(document.uri, diagnostics);
         console.log(`Parsed ${document.uri} version: ${document.version}`);
-        return new ParsedDocument(document.version, tree, visitor.symbols, referenceVisitor.references, visitor.imports);
+        return new ParsedDocument(document.version, tree, visitor.packageName, visitor.symbols, referenceVisitor.references, visitor.imports);
     }
 }

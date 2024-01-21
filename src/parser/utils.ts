@@ -12,3 +12,9 @@ export function convertCompleteRange(tokenStart: Token, tokenEnd: Token): vscode
     return new vscode.Range(new vscode.Position(tokenStart.line - 1, tokenStart.column),
         new vscode.Position(tokenEnd.line - 1, tokenEnd.column + length));
 }
+
+export async function locateImportByQualifiedName(name: string): Promise<vscode.Uri[]> {
+    const maxSearchResults = 10;
+    const pathSuffix = name.replace(/\./g, '/') + '.zs';
+    return vscode.workspace.findFiles(`**/${pathSuffix}`, undefined, maxSearchResults);
+}

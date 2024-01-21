@@ -1,3 +1,4 @@
 node_modules/*
 out
 *.vsix
+src/antlr4/.antlr/*

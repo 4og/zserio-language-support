@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [0.10.0] - 2025-01-05
+
+- Update grammar to zserio 2.16.0.
+- Add basic support for code completion.
+
 ## [0.9.0] - 2024-01-18
 
 - Update grammar to zserio 2.13.0.

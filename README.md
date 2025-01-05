@@ -5,3 +5,4 @@ This extension provides [zserio](https://github.com/ndsev/zserio) schema languag
 - Syntax checking
 - Go to definition and peek definition
 - Symbol search
+- Basic autocomplete support

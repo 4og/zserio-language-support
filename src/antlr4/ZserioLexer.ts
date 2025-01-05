@@ -1,4 +1,4 @@
-// Generated from ZserioLexer.g4 by ANTLR 4.13.1
+// Generated from ZserioLexer.g4 by ANTLR 4.13.2
 // noinspection ES6UnusedImports,JSUnusedGlobalSymbols,JSUnusedLocalSymbols
 import {
 	ATN,
@@ -129,6 +129,7 @@ export default class ZserioLexer extends Lexer {
 	public static readonly INVALID_STRING_LITERAL = 115;
 	public static readonly INVALID_TOKEN = 116;
 	public static readonly EOF = Token.EOF;
+	public static readonly DOC = 2;
 
 	public static readonly channelNames: string[] = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN", 
                                                                                       "DOC" ];

@@ -1,4 +1,4 @@
-// Generated from ZserioParser.g4 by ANTLR 4.13.1
+// Generated from ZserioParser.g4 by ANTLR 4.13.2
 // noinspection ES6UnusedImports,JSUnusedGlobalSymbols,JSUnusedLocalSymbols
 
 import {
@@ -136,7 +136,7 @@ export default class ZserioParser extends Parser {
 	public static readonly INVALID_STRING_LITERAL = 115;
 	public static readonly INVALID_TOKEN = 116;
 	public static readonly RSHIFT = 117;
-	public static readonly EOF = Token.EOF;
+	public static override readonly EOF = Token.EOF;
 	public static readonly RULE_packageDeclaration = 0;
 	public static readonly RULE_compatibilityVersionDirective = 1;
 	public static readonly RULE_packageNameDefinition = 2;
@@ -6627,7 +6627,7 @@ export class ExpressionContext extends ParserRuleContext {
     public get ruleIndex(): number {
     	return ZserioParser.RULE_expression;
 	}
-	public copyFrom(ctx: ExpressionContext): void {
+	public override copyFrom(ctx: ExpressionContext): void {
 		super.copyFrom(ctx);
 	}
 }

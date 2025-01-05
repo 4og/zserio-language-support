@@ -6,8 +6,8 @@
 
 set -Eeuo pipefail
 
-ZSERIO_VER=v2.13.0
-ANTLR4_VER=4.13.1
+ZSERIO_VER=v2.16.0
+ANTLR4_VER=4.13.2
 
 ANTLR4_URL=https://www.antlr.org/download/antlr-$ANTLR4_VER-complete.jar
 ZSERIO_URL_BASE=https://raw.githubusercontent.com/ndsev/zserio/$ZSERIO_VER/compiler/core/antlr

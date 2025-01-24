@@ -1,5 +1,5 @@
 import ZserioParserVisitor from '../antlr4/ZserioParserVisitor';
-import { TypeReferenceContext } from '../antlr4/ZserioParser'
+import { TypeReferenceContext } from '../antlr4/ZserioParser';
 import { EntityReference } from './entityReference';
 import { convertCompleteRange } from './utils';
 
@@ -13,5 +13,5 @@ export class TypeReferenceVisitor extends ZserioParserVisitor<void> {
             this.references.push(new EntityReference(name, range));
         }
         return this.visitChildren(ctx);
-    }
+    };
 }

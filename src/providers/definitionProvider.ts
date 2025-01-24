@@ -9,7 +9,7 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
 
     parsedDocumentCollection: ParsedDocumentCollection;
 
-    async provideDefinition(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Definition> {
+    async provideDefinition(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.Definition> {
 
         const parsedDocument = await this.parsedDocumentCollection.getParsedDocument(document);
 
@@ -28,7 +28,7 @@ export default class DefinitionProvider implements vscode.DefinitionProvider {
         }
         const packageLocations = await locateImportByQualifiedName(packageReference.name);
         const emptyRange = new vscode.Range(0, 0, 0, 0);
-        const locations = []
+        const locations = [];
         for (const uri of packageLocations.values()) {
             locations.push(new vscode.Location(uri, emptyRange));
         }

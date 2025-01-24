@@ -8,7 +8,7 @@ export default class DocumentSemanticTokensProvider implements vscode.DocumentSe
 
     private parsedDocumentCollection: ParsedDocumentCollection;
 
-    async provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SemanticTokens> {
+    async provideDocumentSemanticTokens(document: vscode.TextDocument, _token: vscode.CancellationToken): Promise<vscode.SemanticTokens> {
         const parsedDocument = await this.parsedDocumentCollection.getParsedDocument(document);
         const builder = new vscode.SemanticTokensBuilder(DocumentSemanticTokensProvider.getLegend());
         this.visitSymbols(builder, parsedDocument.symbols);

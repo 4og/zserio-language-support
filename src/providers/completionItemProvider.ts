@@ -5,13 +5,13 @@ import { locateImportByQualifiedName } from '../parser/utils';
 export default class CompletionItemProvider implements vscode.CompletionItemProvider {
     constructor(parsedDocumentCollection: ParsedDocumentCollection) {
         this.parsedDocumentCollection = parsedDocumentCollection;
-        this.keywords = parsedDocumentCollection.completionKeywords.map((name: string): vscode.CompletionItem => { return { label: name, kind: vscode.CompletionItemKind.Keyword } });
+        this.keywords = parsedDocumentCollection.completionKeywords.map((name: string): vscode.CompletionItem => { return { label: name, kind: vscode.CompletionItemKind.Keyword }; });
     }
 
     parsedDocumentCollection: ParsedDocumentCollection;
     keywords: vscode.CompletionItem[];
 
-    async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
+    async provideCompletionItems(document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
         const doc = await this.parsedDocumentCollection.getParsedDocument(document);
         const currentDocumentSymbols = doc.symbols.map((symbol: vscode.DocumentSymbol) => this.createCompletionItem(symbol, doc.docStrings.get(symbol)));
 

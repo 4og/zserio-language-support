@@ -8,7 +8,7 @@ export default class DocumentSymbolProvider implements vscode.DocumentSymbolProv
 
     parsedDocumentCollection: ParsedDocumentCollection;
 
-    async provideDocumentSymbols(document: vscode.TextDocument, token: vscode.CancellationToken):
+    async provideDocumentSymbols(document: vscode.TextDocument, _token: vscode.CancellationToken):
         Promise<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {
         return (await this.parsedDocumentCollection.getParsedDocument(document)).symbols;
     }

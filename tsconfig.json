@@ -8,7 +8,7 @@
         "outDir": "out",
         "sourceMap": true,
         "strict": false,
-        "allowJs": true,
+        "allowJs": false,
         "esModuleInterop": true,
         "rootDir": "src"
     },

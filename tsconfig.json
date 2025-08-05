@@ -12,9 +12,11 @@
         "esModuleInterop": true,
         "rootDir": "src"
     },
+    "include": [
+        "src/**/*.ts"
+    ],
     "exclude": [
         "node_modules",
-        ".vscode-test",
-        "out"
+        ".vscode-test"
     ]
 }

@@ -67,6 +67,46 @@ suite('Extension Test Suite', () => {
         assert.strictEqual(diagnosticsAfterDeletion.length, 0);
     });
 
+    test('Syntax error detection', async () => {
+        const errorFile = vscode.Uri.joinPath(testWorkspaceFolder, 'testSyntaxError.zs');
+        const document = await vscode.workspace.openTextDocument(errorFile);
+        await vscode.window.showTextDocument(document);
+
+        // Allow time for parsing and diagnostics
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        const diagnostics = vscode.languages.getDiagnostics(errorFile);
+        assert.strictEqual(diagnostics.length, 4, 'Expected 4 diagnostics');
+
+        const expectedErrors = [
+            {
+                message: /extraneous input 'wrong' expecting.*/,
+                range: new vscode.Range(0, 0, 0, 5)
+            },
+            {
+                message: /no viable alternative at input 'a;'/,
+                range: new vscode.Range(1, 19, 1, 20)
+            },
+            {
+                message: /mismatched input 'import' expecting ';'/,
+                range: new vscode.Range(2, 0, 2, 6)
+            },
+            {
+                message: /extraneous input 'c' expecting ';'/,
+                range: new vscode.Range(3, 12, 3, 13)
+            }
+        ];
+
+        diagnostics.sort((a, b) => a.range.start.line - b.range.start.line);
+
+        expectedErrors.forEach((expected, i) => {
+            const diagnostic = diagnostics[i];
+            assert.strictEqual(diagnostic.severity, vscode.DiagnosticSeverity.Error, `Diagnostic ${i}: severity should be Error`);
+            assert.match(diagnostic.message, expected.message, `Diagnostic ${i}: message is incorrect`);
+            assert.deepStrictEqual(diagnostic.range, expected.range, `Diagnostic ${i}: range is incorrect`);
+        });
+    });
+
     test('Document symbol provider returns symbols', async () => {
         const document = await vscode.workspace.openTextDocument(testFile);
         await vscode.window.showTextDocument(document);

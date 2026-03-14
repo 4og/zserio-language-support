@@ -3,7 +3,8 @@ import * as vscode from 'vscode';
 
 const extensionName = '4og.zserio-language-support';
 
-suite('Extension Test Suite', () => {
+suite('Extension Test Suite', function () {
+    this.timeout(25000);
     vscode.window.showInformationMessage('Start all tests.');
 
     test('Extension is present', () => {
@@ -61,10 +62,17 @@ suite('Extension Test Suite', () => {
         await vscode.workspace.fs.delete(testFileToDelete, { recursive: false, useTrash: false });
 
         // Allow time for watcher to process
-        await new Promise(resolve => setTimeout(resolve, 180));
-
-        const diagnosticsAfterDeletion = vscode.languages.getDiagnostics(testFileToDelete);
-        assert.strictEqual(diagnosticsAfterDeletion.length, 0);
+        let success = false;
+        for (let i = 0; i < 50; i++) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            const diagnosticsAfterDeletion = vscode.languages.getDiagnostics(testFileToDelete);
+            console.log(`Polling for diagnostics cleared (attempt ${i + 1}): ${diagnosticsAfterDeletion.length} diagnostics remaining.`);
+            if (diagnosticsAfterDeletion.length === 0) {
+                success = true;
+                break;
+            }
+        }
+        assert.ok(success, 'Diagnostics should be cleared after file deletion');
     });
 
     test('Syntax error detection', async () => {

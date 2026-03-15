@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+- Improve file deletion detection.
+- Modernize internal codebase and update dependencies.
 
 ## [0.10.0] - 2025-01-05
 

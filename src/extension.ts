@@ -26,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
         [languageId], new CompletionItemProvider(parsedDocumentCollection));
     context.subscriptions.push(completionProvider);
 
-    if (vscode.window.activeTextEditor) {
+    if (vscode.window.activeTextEditor?.document) {
         parsedDocumentCollection.parseDocument(vscode.window.activeTextEditor.document);
     }
 
@@ -46,13 +46,13 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(document => parsedDocumentCollection.parseDocument(document)));
 
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {
-        if (editor) {
+        if (editor?.document) {
             parsedDocumentCollection.parseDocument(editor.document);
         }
     }));
 
     context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(editor => {
-        if (editor) {
+        if (editor?.document) {
             parsedDocumentCollection.parseDocument(editor.document);
         }
     }));

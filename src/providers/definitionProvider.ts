@@ -3,11 +3,8 @@ import { ParsedDocumentCollection, ParsedDocument } from '../parser/parser';
 import { locateImportByQualifiedName } from '../parser/utils';
 
 export default class DefinitionProvider implements vscode.DefinitionProvider {
-    constructor(parsedDocumentCollection: ParsedDocumentCollection) {
-        this.parsedDocumentCollection = parsedDocumentCollection;
+    constructor(private parsedDocumentCollection: ParsedDocumentCollection) {
     }
-
-    parsedDocumentCollection: ParsedDocumentCollection;
 
     async provideDefinition(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken): Promise<vscode.Definition> {
 

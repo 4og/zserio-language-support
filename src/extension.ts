@@ -34,6 +34,15 @@ export function activate(context: vscode.ExtensionContext) {
     watcher.onDidDelete(uri => parsedDocumentCollection.disposeDocumentByUri(uri));
     context.subscriptions.push(watcher);
 
+    // In case the file watcher does not notify about deleted files
+    context.subscriptions.push(vscode.workspace.onDidDeleteFiles(event => {
+        for (const uri of event.files) {
+            if (uri.path.endsWith('.zs')) {
+                parsedDocumentCollection.disposeDocumentByUri(uri);
+            }
+        }
+    }));
+
     context.subscriptions.push(vscode.workspace.onDidOpenTextDocument(document => parsedDocumentCollection.parseDocument(document)));
 
     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(editor => {

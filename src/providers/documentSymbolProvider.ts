@@ -2,11 +2,8 @@ import * as vscode from 'vscode';
 import { ParsedDocumentCollection } from '../parser/parser';
 
 export default class DocumentSymbolProvider implements vscode.DocumentSymbolProvider {
-    constructor(parsedDocumentCollection: ParsedDocumentCollection) {
-        this.parsedDocumentCollection = parsedDocumentCollection;
+    constructor(private parsedDocumentCollection: ParsedDocumentCollection) {
     }
-
-    parsedDocumentCollection: ParsedDocumentCollection;
 
     async provideDocumentSymbols(document: vscode.TextDocument, _token: vscode.CancellationToken):
         Promise<vscode.SymbolInformation[] | vscode.DocumentSymbol[]> {

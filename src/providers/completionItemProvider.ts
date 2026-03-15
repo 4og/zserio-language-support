@@ -3,12 +3,10 @@ import { ParsedDocumentCollection } from '../parser/parser';
 import { locateImportByQualifiedName } from '../parser/utils';
 
 export default class CompletionItemProvider implements vscode.CompletionItemProvider {
-    constructor(parsedDocumentCollection: ParsedDocumentCollection) {
-        this.parsedDocumentCollection = parsedDocumentCollection;
+    constructor(private parsedDocumentCollection: ParsedDocumentCollection) {
         this.keywords = parsedDocumentCollection.completionKeywords.map((name: string): vscode.CompletionItem => { return { label: name, kind: vscode.CompletionItemKind.Keyword }; });
     }
 
-    parsedDocumentCollection: ParsedDocumentCollection;
     keywords: vscode.CompletionItem[];
 
     async provideCompletionItems(document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {

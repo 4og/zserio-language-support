@@ -2,11 +2,8 @@ import * as vscode from 'vscode';
 import { ParsedDocumentCollection } from '../parser/parser';
 
 export default class DocumentSemanticTokensProvider implements vscode.DocumentSemanticTokensProvider {
-    constructor(parsedDocumentCollection: ParsedDocumentCollection) {
-        this.parsedDocumentCollection = parsedDocumentCollection;
+    constructor(private parsedDocumentCollection: ParsedDocumentCollection) {
     }
-
-    private parsedDocumentCollection: ParsedDocumentCollection;
 
     async provideDocumentSemanticTokens(document: vscode.TextDocument, _token: vscode.CancellationToken): Promise<vscode.SemanticTokens> {
         const parsedDocument = await this.parsedDocumentCollection.getParsedDocument(document);

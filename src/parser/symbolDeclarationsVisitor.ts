@@ -19,10 +19,7 @@ class BaseZserioParserVisitor extends ZserioParserVisitor<void> {
     markdownCommentRegex = /(^\s*\/\*!|!\*\/$)/gm;
 
     createSymbol(ctxId: IdContext, ctxWhole: ParserRuleContext, detail: string, kind: vscode.SymbolKind, childrenVisitor?: BaseZserioParserVisitor): vscode.DocumentSymbol {
-        let name = ctxId.getText();
-        if (!name) {
-            name = "<invalid>";
-        }
+        const name = ctxId.getText() ?? "<invalid>";
         const range = convertCompleteRange(ctxWhole.start, ctxWhole.stop);
         let selectionRange = convertRange(ctxId.start);
 
@@ -78,13 +75,13 @@ class EnumLikeVisitor extends BaseZserioParserVisitor {
 class StructLikeVisitor extends BaseZserioParserVisitor {
     override visitStructureFieldDefinition = (ctx: StructureFieldDefinitionContext) => {
         const fieldTypeId = ctx.fieldTypeId();
-        if (fieldTypeId !== null) {
+        if (fieldTypeId) {
             this.symbols.push(this.createSymbol(fieldTypeId.id(), ctx, "", vscode.SymbolKind.Field));
         }
     };
     override visitChoiceFieldDefinition = (ctx: ChoiceFieldDefinitionContext) => {
         const fieldTypeId = ctx.fieldTypeId();
-        if (fieldTypeId !== null) {
+        if (fieldTypeId) {
             this.symbols.push(this.createSymbol(fieldTypeId.id(), ctx, "", vscode.SymbolKind.Field));
         }
     };
@@ -102,7 +99,7 @@ class StructLikeVisitor extends BaseZserioParserVisitor {
     };
     override visitFunctionDefinition = (ctx: FunctionDefinitionContext) => {
         const functionName = ctx.functionName();
-        if (functionName !== null) {
+        if (functionName) {
             this.symbols.push(this.createSymbol(functionName.id(), ctx, "", vscode.SymbolKind.Function));
         }
     };

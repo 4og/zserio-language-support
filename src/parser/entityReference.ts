@@ -1,10 +1,5 @@
 import * as vscode from 'vscode';
 
 export class EntityReference {
-    constructor(name: string, range: vscode.Range) {
-        this.name = name;
-        this.range = range;
-    }
-    name: string;
-    range: vscode.Range;
+    constructor(public name: string, public range: vscode.Range) {}
 }

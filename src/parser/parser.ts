@@ -8,38 +8,29 @@ import { TypeReferenceVisitor } from './typeReferenceVisitor';
 import { SyntaxErrorListener } from './syntaxErrorListener';
 
 export class ParsedDocument {
-    constructor(version: number, tree: ParserRuleContext, packageName: string | undefined, symbols: vscode.DocumentSymbol[], docStrings: Map<vscode.DocumentSymbol, vscode.MarkdownString>, references: EntityReference[], imports: EntityReference[]) {
-        this.version = version;
-        this.tree = tree;
-        this.packageName = packageName;
-        this.symbols = symbols;
-        this.docStrings = docStrings;
-        this.references = references;
-        this.imports = imports;
-    }
-    version: number;
-    tree: ParserRuleContext;
-    packageName?: string;
-    symbols: vscode.DocumentSymbol[];
-    docStrings: Map<vscode.DocumentSymbol, vscode.MarkdownString>;
-    references: EntityReference[];
-    imports: EntityReference[];
+    constructor(
+        public version: number,
+        public tree: ParserRuleContext,
+        public packageName: string | undefined,
+        public symbols: vscode.DocumentSymbol[],
+        public docStrings: Map<vscode.DocumentSymbol, vscode.MarkdownString>,
+        public references: EntityReference[],
+        public imports: EntityReference[]
+    ) {}
 }
 
 export class ParsedDocumentCollection {
-    constructor(diagnostic_collection: vscode.DiagnosticCollection) {
-        this.diagnosticCollection = diagnostic_collection;
+    constructor(public diagnosticCollection: vscode.DiagnosticCollection) {
         this.parsedDocuments = new Map<string, ParsedDocument>();
-        this.completionKeywords = ZserioLexer.literalNames.filter((name: string | null) => name && name.match(/.*\w.*/) != null).map((name: string) => name.slice(1, -1));
+        this.completionKeywords = ZserioLexer.literalNames.filter((name: string | null) => name?.match(/.*\w.*/)).map((name: string) => name.slice(1, -1));
     }
 
-    diagnosticCollection: vscode.DiagnosticCollection;
     parsedDocuments: Map<string, ParsedDocument>;
     completionKeywords: string[];
 
     async getParsedDocument(document: vscode.TextDocument): Promise<ParsedDocument> {
         const parsedDocument = this.parsedDocuments.get(document.uri.toString());
-        if (parsedDocument && parsedDocument.version == document.version) {
+        if (parsedDocument?.version === document.version) {
             return parsedDocument;
         }
         const pd = this.parseZserioDocument(document, this.diagnosticCollection);

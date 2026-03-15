@@ -19,7 +19,7 @@ async function main() {
     await runTests({
       extensionDevelopmentPath,
       extensionTestsPath,
-      launchArgs: [testWorkspace, '--disable-extensions', '--log', 'trace', '--verbose'],
+      launchArgs: [testWorkspace, '--disable-extensions', '--log', 'trace'],
     });
   } catch (err) {
     console.error(err);

@@ -50,7 +50,20 @@ suite('Extension Test Suite', function () {
 
     test('File watcher handles file deletion', async () => {
         const testFileToDelete = vscode.Uri.joinPath(testWorkspaceFolder, 'testFileToDelete.zs');
+
+        // Ensure the OS file watcher registers the creation before we delete it.
+        // On MacOS, fsevents will coalesce rapid create+delete pairs and drop the events entirely.
+        const creationWatcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(testWorkspaceFolder, 'testFileToDelete.zs'), false, true, true);
+        const creationPromise = new Promise<void>(resolve => {
+            creationWatcher.onDidCreate(() => resolve());
+        });
+
         await vscode.workspace.fs.writeFile(testFileToDelete, Buffer.from('abc'));
+
+        // Wait for the OS to report the creation so the deletion becomes a new watcher event
+        await creationPromise;
+        creationWatcher.dispose();
+
         const document = await vscode.workspace.openTextDocument(testFileToDelete);
         await vscode.window.showTextDocument(document);
 
@@ -63,7 +76,7 @@ suite('Extension Test Suite', function () {
 
         // Allow time for watcher to process
         let success = false;
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 10; i++) {
             await new Promise(resolve => setTimeout(resolve, 100));
             const diagnosticsAfterDeletion = vscode.languages.getDiagnostics(testFileToDelete);
             console.log(`Polling for diagnostics cleared (attempt ${i + 1}): ${diagnosticsAfterDeletion.length} diagnostics remaining.`);

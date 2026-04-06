@@ -51,6 +51,18 @@ suite('Extension Test Suite', function () {
     test('File watcher handles file deletion', async () => {
         const testFileToDelete = vscode.Uri.joinPath(testWorkspaceFolder, 'testFileToDelete.zs');
 
+        // Ensure the file does not already exist so that the subsequent writeFile
+        // triggers a genuine onDidCreate event on all platforms (macOS fsevents
+        // correctly reports a write to an existing file as a change, not a create).
+        try {
+            await vscode.workspace.fs.delete(testFileToDelete, { recursive: false, useTrash: false });
+        } catch {
+            // File may not exist – that's fine.
+        }
+
+        // Give the file watcher time to process the deletion before setting up the creation watcher.
+        await new Promise(resolve => setTimeout(resolve, 200));
+
         // Ensure the OS file watcher registers the creation before we delete it.
         // On MacOS, fsevents will coalesce rapid create+delete pairs and drop the events entirely.
         const creationWatcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(testWorkspaceFolder, 'testFileToDelete.zs'), false, true, true);

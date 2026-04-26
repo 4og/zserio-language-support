@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import ZserioParserVisitor from '../antlr4/ZserioParserVisitor';
-import ZserioParser, {
+import { ZserioParserVisitor } from '../antlr4/ZserioParserVisitor';
+import { ZserioParser,
     BitmaskDeclarationContext, BitmaskValueContext, ChoiceDeclarationContext, ChoiceFieldDefinitionContext, ConstDefinitionContext,
     EnumDeclarationContext, EnumItemContext, FunctionDefinitionContext, IdContext, ImportDeclarationContext, InstantiateDeclarationContext,
     PackageNameDefinitionContext,
@@ -10,9 +10,10 @@ import ZserioParser, {
 } from '../antlr4/ZserioParser';
 import { EntityReference } from './entityReference';
 import { convertRange, convertCompleteRange } from './utils';
-import { ParserRuleContext } from 'antlr4';
+import { ParserRuleContext, TokenStream } from 'antlr4ng';
 
 class BaseZserioParserVisitor extends ZserioParserVisitor<void> {
+    tokenStream?: TokenStream;
     symbols: vscode.DocumentSymbol[] = [];
     docStrings = new Map<vscode.DocumentSymbol, vscode.MarkdownString>;
     docCommentRegex = /(^\/\*\*|\*\/$|^[^\S\r\n]*\*(\/)?)/gm;
@@ -20,8 +21,8 @@ class BaseZserioParserVisitor extends ZserioParserVisitor<void> {
 
     createSymbol(ctxId: IdContext, ctxWhole: ParserRuleContext, detail: string, kind: vscode.SymbolKind, childrenVisitor?: BaseZserioParserVisitor): vscode.DocumentSymbol {
         const name = ctxId.getText() ?? "<invalid>";
-        const range = convertCompleteRange(ctxWhole.start, ctxWhole.stop);
-        let selectionRange = convertRange(ctxId.start);
+        const range = convertCompleteRange(ctxWhole.start!, ctxWhole.stop!);
+        let selectionRange = convertRange(ctxId.start!);
 
         if (!range.contains(selectionRange)) {
             selectionRange = range;
@@ -40,17 +41,17 @@ class BaseZserioParserVisitor extends ZserioParserVisitor<void> {
     }
 
     pushDocString(ctx: ParserRuleContext, symbol: vscode.DocumentSymbol) {
-        const idx = ctx.start.tokenIndex;
-        if (idx < 1) {
+        const idx = ctx.start!.tokenIndex;
+        if (idx < 1 || !this.tokenStream) {
             return;
         }
-        const token = ctx.parser.getTokenStream().get(idx - 1);
+        const token = this.tokenStream.get(idx - 1);
 
         if (token.type == ZserioParser.DOC_COMMENT) {
-            this.docStrings.set(symbol, new vscode.MarkdownString(token.text.replaceAll(this.docCommentRegex, '').trim()));
+            this.docStrings.set(symbol, new vscode.MarkdownString(token.text!.replaceAll(this.docCommentRegex, '').trim()));
         }
         if (token.type == ZserioParser.MARKDOWN_COMMENT) {
-            this.docStrings.set(symbol, new vscode.MarkdownString(token.text.replaceAll(this.markdownCommentRegex, '').trim()));
+            this.docStrings.set(symbol, new vscode.MarkdownString(token.text!.replaceAll(this.markdownCommentRegex, '').trim()));
         }
     }
 
@@ -109,16 +110,20 @@ export class SymbolDeclarationsVisitor extends BaseZserioParserVisitor {
     packageName?: string;
     imports: EntityReference[] = [];
 
+    constructor(tokenStream: TokenStream) {
+        super();
+        this.tokenStream = tokenStream;
+    }
 
     override visitPackageNameDefinition = (ctx: PackageNameDefinitionContext) => {
-        const ids = ctx.id_list();
+        const ids = ctx.id();
         this.packageName = ids.map(i => i.getText()).join(".");
     };
 
     override visitImportDeclaration = (ctx: ImportDeclarationContext) => {
-        const ids = ctx.id_list();
+        const ids = ctx.id();
         const name = ids.map(i => i.getText()).join(".");
-        const range = convertRange(ids[0].start).union(convertRange(ids[ids.length - 1].start));
+        const range = convertRange(ids[0].start!).union(convertRange(ids[ids.length - 1].start!));
         this.imports.push(new EntityReference(name, range));
     };
     override visitSubtypeDeclaration = (ctx: SubtypeDeclarationContext) => {

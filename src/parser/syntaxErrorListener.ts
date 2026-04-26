@@ -1,12 +1,13 @@
-import { ErrorListener, Token, Recognizer, RecognitionException } from 'antlr4';
+import { BaseErrorListener, RecognitionException, Recognizer, Token } from 'antlr4ng';
+import type { ATNSimulator } from 'antlr4ng';
 import * as vscode from 'vscode';
 
-export class SyntaxErrorListener extends ErrorListener<Token> {
+export class SyntaxErrorListener extends BaseErrorListener {
     constructor(public diagnostics: vscode.Diagnostic[]) {
         super();
     }
-    override syntaxError(recognizer: Recognizer<Token>, offendingSymbol: Token, line: number, column: number, msg: string, _e: RecognitionException | undefined): void {
-        const length = offendingSymbol.stop - offendingSymbol.start + 1;
+    override syntaxError<S extends Token, T extends ATNSimulator>(recognizer: Recognizer<T>, offendingSymbol: S | null, line: number, column: number, msg: string, _e: RecognitionException | null): void {
+        const length = offendingSymbol ? offendingSymbol.stop - offendingSymbol.start + 1 : 1;
         this.diagnostics.push({
             code: '',
             message: msg,

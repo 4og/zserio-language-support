@@ -76,11 +76,12 @@
         "@vscode/test-cli": "^0.0.12",
         "@vscode/test-electron": "^2.5.2",
         "@vscode/vsce": "^3.7.1",
+        "antlr4ng-cli": "^2.0.0",
         "eslint": "^10.0.3",
         "typescript": "^5.9.3",
         "typescript-eslint": "^8.57.0"
     },
     "dependencies": {
-        "antlr4": "^4.13.2"
+        "antlr4ng": "^3.0.16"
     }
 }

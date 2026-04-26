@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import { CharStream, CommonTokenStream, ParserRuleContext } from 'antlr4';
-import ZserioLexer from '../antlr4/ZserioLexer';
-import ZserioParser from '../antlr4/ZserioParser';
+import { CharStream, CommonTokenStream, ParserRuleContext } from 'antlr4ng';
+import { ZserioLexer } from '../antlr4/ZserioLexer';
+import { ZserioParser } from '../antlr4/ZserioParser';
 import { EntityReference } from './entityReference';
 import { SymbolDeclarationsVisitor } from './symbolDeclarationsVisitor';
 import { TypeReferenceVisitor } from './typeReferenceVisitor';
@@ -63,7 +63,7 @@ export class ParsedDocumentCollection {
 
     parseZserioDocument(document: vscode.TextDocument, collection: vscode.DiagnosticCollection): ParsedDocument {
         collection.delete(document.uri);
-        const chars = new CharStream(document.getText());
+        const chars = CharStream.fromString(document.getText());
         const lexer = new ZserioLexer(chars);
         const tokens = new CommonTokenStream(lexer);
         const parser = new ZserioParser(tokens);
@@ -73,7 +73,7 @@ export class ParsedDocumentCollection {
         parser.addErrorListener(new SyntaxErrorListener(diagnostics));
         const tree = parser.packageDeclaration();
 
-        const visitor = new SymbolDeclarationsVisitor();
+        const visitor = new SymbolDeclarationsVisitor(tokens);
         visitor.visit(tree);
 
         const referenceVisitor = new TypeReferenceVisitor();

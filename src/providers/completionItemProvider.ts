@@ -34,6 +34,12 @@ function computeTokenIndex(tokenStream: CommonTokenStream, line: number, column:
             if (column < tokenEnd) {
                 return i;
             }
+            // When the cursor is exactly at the end of a word-like token,
+            // the user is still typing that token - use its index so C3
+            // treats it as the caret position rather than skipping ahead.
+            if (column === tokenEnd && /\w$/.test(token.text ?? '')) {
+                return i;
+            }
         }
     }
 

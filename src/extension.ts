@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(semanticTokensProvider);
 
     const completionProvider = vscode.languages.registerCompletionItemProvider(
-        [languageId], new CompletionItemProvider(parsedDocumentCollection));
+        [languageId], new CompletionItemProvider(parsedDocumentCollection), '.');
     context.subscriptions.push(completionProvider);
 
     if (vscode.window.activeTextEditor?.document) {

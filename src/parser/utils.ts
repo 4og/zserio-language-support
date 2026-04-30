@@ -1,4 +1,4 @@
-import { Token } from 'antlr4';
+import { Token } from 'antlr4ng';
 import * as vscode from 'vscode';
 
 export function convertRange(tokenStart: Token): vscode.Range {

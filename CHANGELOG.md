@@ -3,6 +3,8 @@
 ## [Unreleased]
 - Improve file deletion detection.
 - Modernize internal codebase and update dependencies.
+- Migrate to antlr4ng.
+- Use antlr4-c3 for context-aware code completion.
 
 ## [0.10.0] - 2025-01-05
 

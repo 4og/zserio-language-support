@@ -88,6 +88,12 @@ export default class CompletionItemProvider implements vscode.CompletionItemProv
     constructor(private parsedDocumentCollection: ParsedDocumentCollection) {}
 
     async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): Promise<vscode.CompletionItem[]> {
+        // Check for import context first — provide breadth-first import path completion
+        const importPrefix = this.getImportPrefix(document, position);
+        if (importPrefix !== undefined) {
+            return this.provideImportCompletions(importPrefix);
+        }
+
         const chars = CharStream.fromString(document.getText());
         const lexer = new ZserioLexer(chars);
         lexer.removeErrorListeners();
@@ -158,6 +164,90 @@ export default class CompletionItemProvider implements vscode.CompletionItemProv
         }
 
         return completionItems;
+    }
+
+    /**
+     * Detect if the cursor is inside an import statement.
+     * Returns the completed prefix segments, or undefined if not in an import context.
+     */
+    private getImportPrefix(document: vscode.TextDocument, position: vscode.Position): string[] | undefined {
+        const lineText = document.lineAt(position.line).text.substring(0, position.character);
+        const match = lineText.match(/^\s*import\s+([\w.]*)$/);
+        if (!match) return undefined;
+        const typed = match[1];
+        if (!typed) return [];
+        const parts = typed.split('.');
+        // If ends with dot, all typed parts are completed segments;
+        // otherwise the last part is still being typed — exclude it.
+        return parts.slice(0, -1);
+    }
+
+    /**
+     * Provide completions for import paths by lazily searching the filesystem.
+     * Zserio package paths map directly to directory structure:
+     *   import com.acme.foo.Bar  →  com/acme/foo/Bar.zs
+     * Only the next level is queried on demand.
+     */
+    private async provideImportCompletions(completedParts: string[]): Promise<vscode.CompletionItem[]> {
+        const relativePath = completedParts.join('/');
+        const pattern = relativePath ? `${relativePath}/*` : '*';
+
+        const [dirs, zsFiles] = await this.listImportLevel(pattern, relativePath);
+        const completions: vscode.CompletionItem[] = [];
+
+        for (const dir of dirs) {
+            completions.push({ label: dir, kind: vscode.CompletionItemKind.Module });
+        }
+
+        // Only suggest file-level targets when we're at least one level deep
+        // (imports require at least one dot: IMPORT id DOT ... SEMICOLON)
+        if (completedParts.length > 0) {
+            for (const name of zsFiles) {
+                completions.push({ label: name, kind: vscode.CompletionItemKind.Reference });
+            }
+            completions.push({ label: '*', kind: vscode.CompletionItemKind.Keyword });
+        }
+
+        return completions;
+    }
+
+    /**
+     * List directories and .zs file stems at the given import level
+     * by probing the workspace filesystem.
+     */
+    private async listImportLevel(globPattern: string, relativePath: string): Promise<[string[], string[]]> {
+        const dirs = new Set<string>();
+        const zsFiles = new Set<string>();
+
+        // Find .zs files one level deeper to detect both leaf files and directories
+        const deeperPattern = relativePath ? `${relativePath}/**/*.zs` : '**/*.zs';
+        const files = await vscode.workspace.findFiles(deeperPattern);
+
+        for (const file of files) {
+            // Extract the workspace-relative path
+            const wsFolder = vscode.workspace.getWorkspaceFolder(file);
+            if (!wsFolder) continue;
+
+            const fileRelative = file.path.substring(wsFolder.uri.path.length + 1);
+            const parts = fileRelative.split('/');
+
+            const prefixDepth = relativePath ? relativePath.split('/').length : 0;
+            if (parts.length <= prefixDepth) continue;
+
+            const nextSegment = parts[prefixDepth];
+
+            if (parts.length === prefixDepth + 1) {
+                // This is a .zs file directly at this level
+                if (nextSegment.endsWith('.zs')) {
+                    zsFiles.add(nextSegment.slice(0, -3));
+                }
+            } else {
+                // There's a subdirectory at this level
+                dirs.add(nextSegment);
+            }
+        }
+
+        return [Array.from(dirs).sort(), Array.from(zsFiles).sort()];
     }
 
     private convertSymbolKindToCompletionItemKind(symbolKind: vscode.SymbolKind) {

@@ -151,15 +151,24 @@ suite('Extension Test Suite', function () {
 
     test('Completion provider returns suggestions', async () => {
         const document = await vscode.workspace.openTextDocument(testFile);
-        const position = new vscode.Position(1, 28);
+        // Position inside struct body where a type reference is expected (field type position)
+        // Line 2: "struct TestStruct2 {TestStruct a;};"
+        //          Position 20 is where "TestStruct" starts (a type reference context)
+        const position = new vscode.Position(2, 20);
         const completions = await vscode.commands.executeCommand<vscode.CompletionList>(
             'vscode.executeCompletionItemProvider',
             document.uri,
             position
         );
         assert.ok(completions && completions.items.length > 0, 'Expected completion items to be present');
-        assert.ok(completions.items.some(item => item.insertText === 'TestStruct'), 'Expected completion item "TestStruct" not found');
-        assert.ok(completions.items.some(item => item.insertText === 'varuint'), 'Expected completion item "varuint" not found');
+        assert.ok(completions.items.some(item => {
+            const label = typeof item.label === 'string' ? item.label : item.label.label;
+            return label === 'TestStruct';
+        }), 'Expected completion item "TestStruct" not found');
+        assert.ok(completions.items.some(item => {
+            const label = typeof item.label === 'string' ? item.label : item.label.label;
+            return label === 'varuint';
+        }), 'Expected completion item "varuint" not found');
     });
 
     test('Definition provider returns locations', async () => {
